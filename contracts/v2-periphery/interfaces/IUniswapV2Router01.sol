@@ -2,8 +2,8 @@
 pragma solidity 0.8.12;
 
 interface IUniswapV2Router01 {
-    function factory() external pure returns (address);
-    function WETH() external pure returns (address);
+    function factory() external view returns (address);
+    function WETH() external view returns (address);
 
     function addLiquidity(
         address tokenA,
@@ -55,7 +55,7 @@ interface IUniswapV2Router01 {
         bool approveMax, uint8 v, bytes32 r, bytes32 s
     ) external returns (uint amountA, uint amountB);
 
-    function removeLiquidtyETHWithPermit(
+    function removeLiquidityETHWithPermit(
         address token,
         uint liquidity,
         uint amountTokenMin,
@@ -73,7 +73,7 @@ interface IUniswapV2Router01 {
         uint deadline
     ) external returns (uint[] memory amounts);
 
-    function swapTokenForExactTokens(
+    function swapTokensForExactTokens(
         uint amountOut,
         uint amountInMax,
         address[] calldata path,
@@ -94,8 +94,8 @@ interface IUniswapV2Router01 {
     external payable returns (uint[] memory amounts);
 
     function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
-    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
-    function getAmountIn(uint amountOut, uint reserveIn, int reserveOut) external pure returns (uint amountIn);
-    function getAmountsOut(uint amountIn, address[] calldata path) external pure returns (uint[] memory amounts);
-    function getAmountsIn(uint amountOut, address[] calldata path) external pure returns (uint[] memory amounts);
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external view returns (uint amountOut);
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) external view returns (uint amountIn);
+    function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
+    function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }

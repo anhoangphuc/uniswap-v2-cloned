@@ -33,27 +33,27 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         );
     }
 
-    function name() public pure returns (string memory) {
+    function name() public pure virtual returns (string memory) {
         return _name;    
     }
 
-    function symbol() public pure returns (string memory) {
+    function symbol() public pure virtual returns (string memory) {
         return _symbol;    
     }
 
-    function decimals() public pure returns (uint8) {
+    function decimals() public pure virtual returns (uint8) {
         return _decimals;    
     }
 
-    function totalSupply() public view returns (uint) {
+    function totalSupply() public view virtual returns (uint) {
         return _totalSupply;    
     }
 
-    function balanceOf(address owner) public view returns (uint) {
+    function balanceOf(address owner) public view virtual returns (uint) {
         return _balances[owner];
     }
 
-    function allowance(address owner, address spender) public view returns (uint) {
+    function allowance(address owner, address spender) public view virtual returns (uint) {
         return _allowances[owner][spender];
     }
 
@@ -85,12 +85,12 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         return true;
     }
 
-    function transfer(address to, uint value) public returns (bool) {
+    function transfer(address to, uint value) public virtual returns (bool) {
         _transfer(msg.sender, to, value);    
         return true;
     }
 
-    function transferFrom(address from, address to, uint value) public returns (bool) {
+    function transferFrom(address from, address to, uint value) public virtual returns (bool) {
         if (_allowances[from][msg.sender] !=  type(uint).max) {
             _allowances[from][msg.sender] = _allowances[from][msg.sender] - value;
         }

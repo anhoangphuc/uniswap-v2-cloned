@@ -94,7 +94,7 @@ contract UniswapV2Pair is UniswapV2ERC20, IUniswapV2Pair {
         return UniswapV2ERC20.allowance(owner, spender);        
     }
 
-    function approve(address spender, uint value) public view override (UniswapV2ERC20, IUniswapV2Pair ) returns (bool) {
+    function approve(address spender, uint value) public override (UniswapV2ERC20, IUniswapV2Pair ) returns (bool) {
         return UniswapV2ERC20.approve(spender, value);
     }
 

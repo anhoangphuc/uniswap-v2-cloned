@@ -163,7 +163,7 @@ contract UniswapV2Pair is UniswapV2ERC20, IUniswapV2Pair {
                 uint rootK = Math.sqrt(uint(reserve0_) * reserve1_);
                 uint rootKLast = Math.sqrt(kLast_);
                 if (rootK > rootKLast) {
-                    uint numerator = totalSupply() * (rootK - rootKLast);
+                    uint numerator = totalSupply_ * (rootK - rootKLast);
                     uint denominator = rootK * 5 + rootKLast;
                     uint liquidity = numerator / denominator;
                     if (liquidity > 0) _mint(feeTo, liquidity);

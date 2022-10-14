@@ -32,13 +32,19 @@ context("Pair", async () => {
         const pairAddress = await pairFactory.getPair(tokenA.address, tokenB.address);
         pair = await ethers.getContractAt("UniswapV2Pair", pairAddress);
         MINIMUM_LIQUIDITY = await pair.MINIMUM_LIQUIDITY();
+        await tokenA.connect(account1).mint(expandTo18Decimals(1000000));
+        await tokenB.connect(account1).mint(expandTo18Decimals(1000000));
     })
+
+    async function addLiquidity(amount0: BigNumber, amount1: BigNumber, account: SignerWithAddress) {
+        await tokenA.connect(account).transfer(pair.address, amount0);
+        await tokenB.connect(account).transfer(pair.address, amount1);
+        await pair.mint(account.address);
+    }
 
     it(`First mint`, async () => {
         const amount0 = expandTo18Decimals(1);
-        await tokenA.connect(account1).mint(amount0);
         const amount1 = expandTo18Decimals(4);
-        await tokenB.connect(account1).mint(amount1);
 
         await tokenA.connect(account1).transfer(pair.address, amount0);
         await tokenB.connect(account1).transfer(pair.address, amount1);
@@ -60,4 +66,28 @@ context("Pair", async () => {
         expect(reserves[1]).to.be.equal(amount1);
     })
 
+    context(`Swap case`, async () => {
+        const swapTestCases: BigNumber[][] = [
+            [1, 5, 10, '1662497915624478906'],
+            [1, 10, 5, '453305446940074565'],
+        
+            [2, 5, 10, '2851015155847869602'],
+            [2, 10, 5, '831248957812239453'],
+        
+            [1, 10, 10, '906610893880149131'],
+            [1, 100, 100, '987158034397061298'],
+            [1, 1000, 1000, '996006981039903216']
+        ].map(a => a.map(n => (typeof n === 'string' ? ethers.BigNumber.from(n) : expandTo18Decimals(n))))
+        swapTestCases.forEach((swapTestCase, i) => {
+            it(`getInputPrice:${i}`, async () => {
+            const [swapAmount, token0Amount, token1Amount, expectedOutputAmount] = swapTestCase
+            await addLiquidity(token0Amount, token1Amount, account1)
+            await tokenA.connect(account1).transfer(pair.address, swapAmount)
+            await expect(pair.swap(0, expectedOutputAmount.add(1), account1.address, '0x')).to.be.revertedWith(
+                'UniswapV2: K'
+            )
+            await pair.swap(0, expectedOutputAmount, account1.address, '0x')
+            })
+        })
+    })
 })

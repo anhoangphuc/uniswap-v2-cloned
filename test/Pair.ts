@@ -90,4 +90,24 @@ context("Pair", async () => {
             })
         })
     })
+
+    context(`Optimistic test case`, async () => {
+        const optimisticTestCases: BigNumber[][] = [
+            ['997000000000000000', 5, 10, 1], // given amountIn, amountOut = floor(amountIn * .997)
+            ['997000000000000000', 10, 5, 1],
+            ['997000000000000000', 5, 5, 1],
+            [1, 5, 5, '1003009027081243732'] // given amountOut, amountIn = ceiling(amountOut / .997)
+        ].map(a => a.map(n => (typeof n === 'string' ? BigNumber.from(n) : expandTo18Decimals(n))));
+        optimisticTestCases.forEach((optimisticTestCase, i) => {
+            it(`optimistic:${i}`, async () => {
+                const [outputAmount, token0Amount, token1Amount, inputAmount] = optimisticTestCase
+                await addLiquidity(token0Amount, token1Amount, account1);
+                await tokenA.connect(account1).transfer(pair.address, inputAmount)
+                await expect(pair.swap(outputAmount.add(1), 0, account1.address, '0x')).to.be.revertedWith(
+                    'UniswapV2: K'
+                )
+                await pair.swap(outputAmount, 0, account1.address, '0x')
+            })
+        })
+    })
 })

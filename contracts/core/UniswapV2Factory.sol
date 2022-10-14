@@ -11,6 +11,10 @@ contract UniswapV2Factory is IUniswapV2Factory {
     mapping(address => mapping(address => address)) public _pairs;
     address[] public allPairs;
 
+    constructor(address feeToSetter_) {
+        _feeToSetter = feeToSetter_;
+    }
+
     function allPairsLength() external view returns (uint) {
         return allPairs.length;
     }

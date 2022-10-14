@@ -110,4 +110,32 @@ context("Pair", async () => {
             })
         })
     })
+
+
+  it('swap:token0', async () => {
+    const token0Amount = expandTo18Decimals(5)
+    const token1Amount = expandTo18Decimals(10)
+    await addLiquidity(token0Amount, token1Amount, account1)
+
+    const swapAmount = expandTo18Decimals(1)
+    const expectedOutputAmount = BigNumber.from('1662497915624478906')
+    await tokenA.connect(account1).transfer(pair.address, swapAmount)
+    await expect(pair.swap(0, expectedOutputAmount, account1.address, '0x'))
+      .to.emit(tokenB, 'Transfer')
+      .withArgs(pair.address, account1.address, expectedOutputAmount)
+      .to.emit(pair, 'Sync')
+      .withArgs(token0Amount.add(swapAmount), token1Amount.sub(expectedOutputAmount))
+      .to.emit(pair, 'Swap')
+      .withArgs(admin.address, swapAmount, 0, 0, expectedOutputAmount, account1.address)
+
+    const reserves = await pair.getReserves()
+    expect(reserves[0]).to.eq(token0Amount.add(swapAmount))
+    expect(reserves[1]).to.eq(token1Amount.sub(expectedOutputAmount))
+    expect(await tokenA.balanceOf(pair.address)).to.eq(token0Amount.add(swapAmount))
+    expect(await tokenB.balanceOf(pair.address)).to.eq(token1Amount.sub(expectedOutputAmount))
+    const totalSupplyToken0 = await tokenA.totalSupply()
+    const totalSupplyToken1 = await tokenB.totalSupply()
+    expect(await tokenA.balanceOf(account1.address)).to.eq(totalSupplyToken0.sub(token0Amount).sub(swapAmount))
+    expect(await tokenB.balanceOf(account1.address)).to.eq(totalSupplyToken1.sub(token1Amount).add(expectedOutputAmount))
+  })
 })
